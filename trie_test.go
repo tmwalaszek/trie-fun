@@ -6,40 +6,31 @@ import (
 )
 
 func TestTrie(t *testing.T) {
+	var tt = []struct {
+		Key   string
+		Value int
+	}{
+		{"wantt", 2},
+		{"want", 3},
+		{"abcdert", 90},
+		{"abc", 91},
+		{"eee", 12},
+	}
+
 	trie := NewTrie()
 
-	//trie.AddValue("want", 15)
-	//trie.AddValue("aaa", 3)
-	trie.AddValue("wantt", 2)
-	trie.AddValue("want", 3)
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("Insert Key %s with value %d", tc.Key, tc.Value), func(t *testing.T) {
+			trie.AddValue(tc.Key, tc.Value)
+		})
+	}
 
-	//trie.AddValue("wbl", 10)
-
-	//v := trie.FindKey("want")
-	//fmt.Println("Wynik ", v)
-	v := trie.FindKey("wantt")
-	fmt.Println("Wynik ", v)
-
-	v = trie.FindKey("want")
-	fmt.Println("Wynik ", v)
-
-	trie.AddValue("wab", 7)
-	v = trie.FindKey("wab")
-	fmt.Println("wynik ", v)
-
-	trie.AddValue("wab", 10)
-	v = trie.FindKey("wab")
-	fmt.Println("wynik ", v)
-
-	trie.AddValue("abcdert", 90)
-	v = trie.FindKey("abcdert")
-	fmt.Println("wynik ", v)
-
-	trie.AddValue("abcd", 901)
-	v = trie.FindKey("abcd")
-	fmt.Println("wynik ", v)
-
-	v = trie.FindKey("abcdert")
-	fmt.Println("wynik ", v)
-
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("Check Key %s value", tc.Key), func(t *testing.T) {
+			v := trie.FindKey(tc.Key)
+			if tc.Value != v {
+				t.Errorf("Wrong value for Key %s. Received value is %d but it should be %d", tc.Key, v, tc.Value)
+			}
+		})
+	}
 }
