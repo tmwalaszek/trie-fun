@@ -12,7 +12,7 @@ type Trie struct {
 
 type TrieNode struct {
 	RemainingKey string
-	Value        int
+	Value        interface{}
 
 	Childrens map[rune]*TrieNode
 }
@@ -23,7 +23,7 @@ func NewTrie() *Trie {
 	}
 }
 
-func (t *Trie) FindKey(key string) (int, error) {
+func (t *Trie) FindKey(key string) (interface{}, error) {
 	if key == "" {
 		return 0, ErrEmptyKey
 	}
@@ -31,7 +31,7 @@ func (t *Trie) FindKey(key string) (int, error) {
 	return t.findKey(key, nil), nil
 }
 
-func (t *Trie) findKey(key string, node *TrieNode) int {
+func (t *Trie) findKey(key string, node *TrieNode) interface{} {
 
 	if node == nil {
 		if t.Childrens == nil {
@@ -66,7 +66,7 @@ func (t *Trie) findKey(key string, node *TrieNode) int {
 	}
 }
 
-func (t *Trie) AddValue(key string, value int) error {
+func (t *Trie) AddValue(key string, value interface{}) error {
 	if key == "" {
 		return ErrEmptyKey
 	}
@@ -75,7 +75,7 @@ func (t *Trie) AddValue(key string, value int) error {
 	return nil
 }
 
-func (t *Trie) addValue(key string, value int, node *TrieNode) {
+func (t *Trie) addValue(key string, value interface{}, node *TrieNode) {
 	if node == nil {
 		val, ok := t.Childrens[rune(key[0])]
 		if !ok {
