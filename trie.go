@@ -1,5 +1,11 @@
 package trie
 
+import "errors"
+
+var (
+	ErrEmptyKey = errors.New("Empty key")
+)
+
 type Trie struct {
 	Childrens map[rune]*TrieNode
 }
@@ -17,8 +23,12 @@ func NewTrie() *Trie {
 	}
 }
 
-func (t *Trie) FindKey(key string) int {
-	return t.findKey(key, nil)
+func (t *Trie) FindKey(key string) (int, error) {
+	if key == "" {
+		return 0, ErrEmptyKey
+	}
+
+	return t.findKey(key, nil), nil
 }
 
 func (t *Trie) findKey(key string, node *TrieNode) int {
@@ -56,8 +66,13 @@ func (t *Trie) findKey(key string, node *TrieNode) int {
 	}
 }
 
-func (t *Trie) AddValue(key string, value int) {
+func (t *Trie) AddValue(key string, value int) error {
+	if key == "" {
+		return ErrEmptyKey
+	}
+
 	t.addValue(key, value, nil)
+	return nil
 }
 
 func (t *Trie) addValue(key string, value int, node *TrieNode) {
