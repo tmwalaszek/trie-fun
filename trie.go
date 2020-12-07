@@ -2,6 +2,7 @@ package trie
 
 import (
 	"errors"
+	"sync"
 )
 
 var (
@@ -10,6 +11,8 @@ var (
 
 type Trie struct {
 	Childrens map[rune]*TrieNode
+
+	mutex *sync.RWMutex
 }
 
 type TrieNode struct {
@@ -22,10 +25,14 @@ type TrieNode struct {
 func NewTrie() *Trie {
 	return &Trie{
 		Childrens: make(map[rune]*TrieNode),
+		mutex:     &sync.RWMutex{},
 	}
 }
 
 func (t *Trie) FindKey(key string) (interface{}, error) {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
 	if key == "" {
 		return 0, ErrEmptyKey
 	}
@@ -64,6 +71,9 @@ func (t *Trie) findKey(key string, node *TrieNode) interface{} {
 }
 
 func (t *Trie) AddValue(key string, value interface{}) (bool, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if key == "" {
 		return false, ErrEmptyKey
 	}
