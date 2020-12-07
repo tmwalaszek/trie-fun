@@ -63,16 +63,15 @@ func (t *Trie) findKey(key string, node *TrieNode) interface{} {
 	}
 }
 
-func (t *Trie) AddValue(key string, value interface{}) error {
+func (t *Trie) AddValue(key string, value interface{}) (bool, error) {
 	if key == "" {
-		return ErrEmptyKey
+		return false, ErrEmptyKey
 	}
 
-	t.addValue(key, value, nil)
-	return nil
+	return t.addValue(key, value, nil), nil
 }
 
-func (t *Trie) addValue(key string, value interface{}, node *TrieNode) {
+func (t *Trie) addValue(key string, value interface{}, node *TrieNode) bool {
 	if node == nil {
 		val, ok := t.Childrens[rune(key[0])]
 		if !ok {
@@ -80,21 +79,30 @@ func (t *Trie) addValue(key string, value interface{}, node *TrieNode) {
 				RemainingKey: key[1:],
 				Value:        value,
 			}
-			return
+			return false
 		}
 
 		node = val
 		key = key[1:]
 	}
 
+	var updated bool
 	if key == node.RemainingKey {
+		if node.Value != nil {
+			updated = true
+		}
+
 		node.Value = value
-		return
+		return updated
 	}
 
 	if key == "" && node.RemainingKey == "" {
+		if node.Value != nil {
+			updated = true
+		}
+
 		node.Value = value
-		return
+		return updated
 	}
 
 	if key == "" && node.RemainingKey != "" {
@@ -109,7 +117,7 @@ func (t *Trie) addValue(key string, value interface{}, node *TrieNode) {
 
 		node.RemainingKey = ""
 		node.Value = value
-		return
+		return updated
 	}
 
 	var newNode *TrieNode
@@ -124,7 +132,7 @@ func (t *Trie) addValue(key string, value interface{}, node *TrieNode) {
 		newNode = node.Childrens[rune(node.RemainingKey[0])]
 
 		node.RemainingKey = ""
-		node.Value = 0
+		node.Value = nil
 	}
 
 	if newNode == nil {
@@ -138,8 +146,8 @@ func (t *Trie) addValue(key string, value interface{}, node *TrieNode) {
 			Value:        value,
 		}
 
-		return
+		return false
 	}
 
-	t.addValue(key[1:], value, newNode)
+	return t.addValue(key[1:], value, newNode)
 }
