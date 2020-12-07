@@ -1,6 +1,8 @@
 package trie
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrEmptyKey = errors.New("Empty key")
@@ -32,19 +34,14 @@ func (t *Trie) FindKey(key string) (interface{}, error) {
 }
 
 func (t *Trie) findKey(key string, node *TrieNode) interface{} {
-
 	if node == nil {
 		if t.Childrens == nil {
-			return 0
+			return nil
 		}
 
 		val, ok := t.Childrens[rune(key[0])]
 		if !ok {
-			return 0
-		}
-
-		if val.RemainingKey == key {
-			return node.Value
+			return nil
 		}
 
 		return t.findKey(key[1:], val)
@@ -55,12 +52,12 @@ func (t *Trie) findKey(key string, node *TrieNode) interface{} {
 	}
 
 	if node.Childrens == nil {
-		return 0
+		return nil
 	}
 
 	val, ok := node.Childrens[rune(key[0])]
 	if !ok {
-		return 0
+		return nil
 	} else {
 		return t.findKey(key[1:], val)
 	}

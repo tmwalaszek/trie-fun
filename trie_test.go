@@ -8,24 +8,29 @@ import (
 func TestTrie(t *testing.T) {
 	var tt = []struct {
 		Key   string
-		Value int
+		Value interface{}
 		Err   error
+		Add   bool
 	}{
-		{"wantt", 2, nil},
-		{"want", 3, nil},
-		{"abcdert", 90, nil},
-		{"abc", 91, nil},
-		{"eee", 12, nil},
-		{"", 1, ErrEmptyKey},
+
+		{"wantt", 2, nil, true},
+		{"want", 3, nil, true},
+		{"abcdert", 90, nil, true},
+		{"abc", 91, nil, true},
+		{"eee", 12, nil, true},
+		{"", 1, ErrEmptyKey, true},
+		{"ee", nil, nil, false},
 	}
 
 	trie := NewTrie()
 
 	for _, tc := range tt {
 		t.Run(fmt.Sprintf("Insert Key %s with value %d", tc.Key, tc.Value), func(t *testing.T) {
-			err := trie.AddValue(tc.Key, tc.Value)
-			if err != tc.Err {
-				t.Errorf("Error mismatch: should get %v but got %v", tc.Err, err)
+			if tc.Add {
+				err := trie.AddValue(tc.Key, tc.Value)
+				if err != tc.Err {
+					t.Errorf("Error mismatch: should get %v but got %v", tc.Err, err)
+				}
 			}
 		})
 	}
@@ -42,7 +47,7 @@ func TestTrie(t *testing.T) {
 			}
 
 			if tc.Value != v {
-				t.Errorf("Wrong value for Key %s Received value is %d but it should be %d", tc.Key, v, tc.Value)
+				t.Errorf("Wrong value for Key %s Received value is %d but it should be %v", tc.Key, v, tc.Value)
 			}
 		})
 	}
