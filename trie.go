@@ -40,38 +40,57 @@ func (t *Trie) FindKey(key string) (interface{}, error) {
 	return t.findKey(key), nil
 }
 
-func (t *Trie) findKey(key string) interface{} {
+type WalkFn func() (*TrieNode, interface{})
+
+func (t *Trie) walk(key string) WalkFn {
 	var node *TrieNode
 	var ok bool
 
-	for {
+	f := func() (*TrieNode, interface{}) {
 		if node == nil {
 			if t.Childrens == nil {
-				return nil
+				return nil, nil
 			}
 
 			node, ok = t.Childrens[rune(key[0])]
 			if !ok {
-				return nil
+				return nil, nil
 			}
 
 			key = key[1:]
-			continue
+			return node, nil
 		}
 
 		if node.RemainingKey == key {
-			return node.Value
+			return nil, node.Value
 		}
 
 		if node.Childrens == nil {
-			return nil
+			return nil, nil
 		}
 
 		node, ok = node.Childrens[rune(key[0])]
 		if !ok {
-			return nil
+			return nil, nil
 		}
 		key = key[1:]
+
+		return node, nil
+	}
+
+	return f
+}
+
+func (t *Trie) findKey(key string) interface{} {
+	walkFn := t.walk(key)
+
+	for {
+		node, value := walkFn()
+		if node == nil && value == nil {
+			return nil
+		} else if value != nil {
+			return value
+		}
 	}
 }
 
