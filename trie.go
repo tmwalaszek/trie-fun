@@ -132,6 +132,13 @@ MAIN:
 	return nil
 }
 
+func (t *Trie) DeleteKey(key string) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	return t.deleteKey(key)
+}
+
 func (t *Trie) findKey(key string) interface{} {
 	walkFn := t.walk(key)
 

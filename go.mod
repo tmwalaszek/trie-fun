@@ -1,3 +1,3 @@
 module github.com/tmwalaszek/trie-fun
 
-go 1.15
+go 1.16
