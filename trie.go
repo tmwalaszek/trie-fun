@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ErrEmptyKey = errors.New("Empty key")
+	ErrEmptyKey    = errors.New("Empty key")
+	ErrKeyNotFound = errors.New("Key not found")
 )
 
 type Trie struct {
@@ -42,6 +43,7 @@ func (t *Trie) FindKey(key string) (interface{}, error) {
 
 type WalkFn func() (*TrieNode, interface{})
 
+// This function does not support case when key is ""
 func (t *Trie) walk(key string) WalkFn {
 	var node *TrieNode
 	var ok bool
@@ -79,6 +81,55 @@ func (t *Trie) walk(key string) WalkFn {
 	}
 
 	return f
+}
+
+func (t *Trie) deleteKey(key string) error {
+	if key == "" {
+		return ErrEmptyKey
+	}
+
+	walkFn := t.walk(key)
+	nodesPath := make([]*TrieNode, len(key))
+
+	var i int
+	for {
+		node, value := walkFn()
+		if node == nil && value == nil {
+			return ErrKeyNotFound
+		} else if value != nil {
+			break
+		}
+
+		nodesPath[i] = node
+		i++
+	}
+
+	i -= 1
+	var removeChild bool
+	var prevNode *TrieNode
+
+MAIN:
+	for ; i >= 0; i-- {
+		if removeChild {
+			for key, value := range nodesPath[i].Childrens {
+				if value == prevNode {
+					delete(nodesPath[i].Childrens, key)
+					break MAIN
+				}
+			}
+		}
+
+		// Lets first check whether the node has any childrens
+		if len(nodesPath[i].Childrens) == 0 {
+			removeChild = true
+			prevNode = nodesPath[i]
+			continue
+		} else {
+			nodesPath[i].Value = nil
+		}
+	}
+
+	return nil
 }
 
 func (t *Trie) findKey(key string) interface{} {

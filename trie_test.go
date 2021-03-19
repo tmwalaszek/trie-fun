@@ -67,4 +67,13 @@ func TestTrie(t *testing.T) {
 			}
 		})
 	}
+
+	for _, tc := range tt {
+		if tc.Add {
+			err := trie.deleteKey(tc.Key)
+			if err != nil && tc.Key != "" {
+				t.Errorf("Error removing key %s: %v", tc.Key, err)
+			}
+		}
+	}
 }
