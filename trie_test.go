@@ -3,7 +3,86 @@ package trie
 import (
 	"fmt"
 	"testing"
+	"time"
+
+	"math/rand"
 )
+
+const charset = "abcdefghijklmnopqrstuvwxyz" +
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var seededRand *rand.Rand = rand.New(
+	rand.NewSource(time.Now().UnixNano()))
+
+func StringWithCharset(length int, charset string) string {
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
+}
+
+func createTree(keys, length int) {
+	t := NewTrie()
+
+	for i := 0; i < keys; i++ {
+		t.AddValue(StringWithCharset(length, charset), i)
+	}
+}
+
+func benchmarkCreateTree(keys, length int, b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		createTree(keys, length)
+	}
+}
+
+func BenchmarkCreateTree_10_10(b *testing.B) {
+	benchmarkCreateTree(10, 10, b)
+}
+
+func BenchmarkCreateTree_10_100(b *testing.B) {
+	benchmarkCreateTree(10, 100, b)
+}
+
+func BenchmarkCreateTree_10_1000(b *testing.B) {
+	benchmarkCreateTree(10, 1000, b)
+}
+
+func BenchmarkCreateTree_100_10(b *testing.B) {
+	benchmarkCreateTree(100, 10, b)
+}
+
+func BenchmarkCreateTree_100_100(b *testing.B) {
+	benchmarkCreateTree(100, 100, b)
+}
+
+func BenchmarkCreateTree_100_1000(b *testing.B) {
+	benchmarkCreateTree(100, 1000, b)
+}
+
+func BenchmarkCreateTree_1000_10(b *testing.B) {
+	benchmarkCreateTree(100, 10, b)
+}
+
+func BenchmarkCreateTree_1000_100(b *testing.B) {
+	benchmarkCreateTree(1000, 100, b)
+}
+
+func BenchmarkCreateTree_1000_1000(b *testing.B) {
+	benchmarkCreateTree(10000, 1000, b)
+}
+
+func BenchmarkCreateTree_10000_10(b *testing.B) {
+	benchmarkCreateTree(10000, 10, b)
+}
+
+func BenchmarkCreateTree_10000_100(b *testing.B) {
+	benchmarkCreateTree(10000, 100, b)
+}
+
+func BenchmarkCreateTree_10000_1000(b *testing.B) {
+	benchmarkCreateTree(10000, 1000, b)
+}
 
 func TestTrie(t *testing.T) {
 	var tt = []struct {
